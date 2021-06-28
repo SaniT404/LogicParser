@@ -1,10 +1,14 @@
+from stack import Stack
+import re
+
 class Logiparse():
     def __init__(self, str=""):
-        self.equation = ""
+        self.equations = []
+        self.variables = {}
 
-        self.setEquation(str)
+        self.addEquation(str)
 
-    def setEquation(self, str):
+    def addEquation(self, str):
         """
         Sets self.equation
         :param str: <str> logic equation
@@ -21,12 +25,12 @@ class Logiparse():
             return False
 
         # Set self.equation
-        self.equation = str
+        self.equations.append(str)
         # return success
         return True
 
-    def getEquation(self):
-        return self.equation
+    def getAllEquations(self):
+        return self.equations
 
     def validateFormat(self, str):
         """
@@ -85,7 +89,7 @@ class Logiparse():
                                 # Get rest of the string if more characters exist beyond the negation
                                 remainder = component[i+1:]
                                 # Check that remaining characters are closing parenthesis
-                                if(not remainder[0] == ')' or not remainder.count(remainder[0]) == len(remainder)):
+                                if(not bool(re.match("^[)']+$", remainder))):
                                     # Error and return failure
                                     err = "Error: variable negation must take place at the tail of the component.\nBroke on: \'" + component + "\'."
                                     return False, err
@@ -108,3 +112,36 @@ class Logiparse():
 
         # Return success
         return True, err
+
+
+    def precedence(operator):
+        """
+        Informs the precedence of operators (',*,+)
+        :param operator: <str> equation operator
+        :return: <int> precedence value (1-3)
+        """
+        if(operator == '+'):
+            return 1
+        elif(operator == '*'):
+            return 2
+        elif(operator == '\''):
+            return 3
+        return 0
+
+    def infixToPostfix(equation):
+        """
+        Converts infix equation notation to postfix equation.
+        :param equation: <str> infix equation
+        :return: <str> postfix equation
+        """
+
+
+        # Initialize to be filled postfix equation string
+        postfix = ""
+        # Initialize stack to be used in postfix conversion. Chosen over list for O(1).
+        stack = Stack()
+        stack.push('#') # Add extra character to avoid underflow
+        # Infix equation's 'components' are identified by space. Retrieve components.
+        components = equation.split(" ")
+        # Loop through components
+        #for component in components:
