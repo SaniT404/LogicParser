@@ -21,5 +21,12 @@ class TestLogiparseMethods(unittest.TestCase):
         res, err = logic.validateFormat("A' + (B * C' + (Dooby * Dilly')')")
         self.assertEqual(res, True)
 
+        # Test double operators
+        res, err = logic.validateFormat("A' + (B * * C' + (Dooby * Dilly')')")
+        self.assertEqual(res, False)
+        # Test invalid negation
+        res, err = logic.validateFormat("A' + (B * C' + (Dooby * Dilly')(dilly)')")
+        self.assertEqual(res, False)
+
 if __name__ == '__main__':
     unittest.main()
